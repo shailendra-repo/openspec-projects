@@ -1,0 +1,80 @@
+:root {
+  --bg: #f4f6f8;
+  --surface: #ffffff;
+  --surface-2: #eef2f6;
+  --text: #17212b;
+  --muted: #5b6775;
+  --border: #d7dde5;
+  --primary: #2563eb;
+  --primary-contrast: #ffffff;
+  --danger: #dc2626;
+  --success: #16a34a;
+  --focus: #0ea5e9;
+  --shadow: 0 1px 2px rgba(0,0,0,0.06);
+  color-scheme: light;
+  font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
+  line-height: 1.4;
+}
+
+html[data-theme="dark"] {
+  --bg: #0f1720;
+  --surface: #16202b;
+  --surface-2: #1d2a38;
+  --text: #e6edf3;
+  --muted: #9fb0c3;
+  --border: #2b3b4d;
+  --primary: #4f8cff;
+  --primary-contrast: #08111d;
+  --danger: #f87171;
+  --success: #4ade80;
+  --focus: #38bdf8;
+  --shadow: 0 1px 2px rgba(0,0,0,0.4);
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--text); }
+button, input, select, textarea { font: inherit; color: inherit; }
+button { cursor: pointer; }
+:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
+
+.app-shell { min-height: 100vh; display: flex; flex-direction: column; }
+.app-header { display: flex; align-items: center; justify-content: space-between; gap: 1rem; padding: 0.75rem 1rem; background: var(--surface); border-bottom: 1px solid var(--border); position: sticky; top: 0; z-index: 2; }
+.app-header h1 { margin: 0; font-size: 1.1rem; }
+.header-actions { display: flex; gap: 0.5rem; align-items: center; flex-wrap: wrap; }
+.layout { display: grid; grid-template-columns: 260px 1fr; min-height: 0; flex: 1; }
+.sidebar { background: var(--surface); border-right: 1px solid var(--border); padding: 1rem; overflow: auto; }
+.main { padding: 1rem; overflow: auto; }
+.section { margin-bottom: 1rem; }
+.section h2, .section h3 { margin: 0 0 0.5rem; font-size: 0.95rem; }
+.nav-list { list-style: none; padding: 0; margin: 0; display: grid; gap: 0.25rem; }
+.nav-btn { width: 100%; text-align: left; padding: 0.45rem 0.6rem; border: 1px solid transparent; background: transparent; border-radius: 6px; color: var(--text); }
+.nav-btn.active, .nav-btn:hover { background: var(--surface-2); border-color: var(--border); }
+.row { display: flex; gap: 0.5rem; align-items: center; flex-wrap: wrap; }
+.grow { flex: 1; }
+.card { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 0.75rem; box-shadow: var(--shadow); }
+input[type="text"], input[type="date"], input[type="datetime-local"], select, textarea {
+  width: 100%; padding: 0.45rem 0.55rem; border: 1px solid var(--border); border-radius: 6px; background: var(--surface); color: var(--text);
+}
+textarea { min-height: 60px; resize: vertical; }
+.btn { padding: 0.4rem 0.7rem; border: 1px solid var(--border); border-radius: 6px; background: var(--surface-2); color: var(--text); }
+.btn.primary { background: var(--primary); color: var(--primary-contrast); border-color: var(--primary); }
+.btn.danger { color: var(--danger); }
+.btn.small { padding: 0.2rem 0.45rem; font-size: 0.85rem; }
+.task-list { list-style: none; padding: 0; margin: 0; display: grid; gap: 0.5rem; }
+.task-item { border: 1px solid var(--border); border-radius: 8px; background: var(--surface); padding: 0.6rem; }
+.task-item.completed .task-title { text-decoration: line-through; color: var(--muted); }
+.task-title { font-weight: 600; }
+.meta { color: var(--muted); font-size: 0.85rem; }
+.badge { display: inline-block; padding: 0.05rem 0.4rem; border-radius: 999px; background: var(--surface-2); border: 1px solid var(--border); font-size: 0.75rem; margin-right: 0.25rem; }
+.subtasks { margin-top: 0.5rem; padding-left: 0.25rem; display: grid; gap: 0.25rem; }
+.subtask { display: flex; gap: 0.4rem; align-items: center; }
+.inline-edit { display: grid; gap: 0.4rem; margin-top: 0.4rem; }
+.toolbar { display: flex; gap: 0.5rem; flex-wrap: wrap; margin-bottom: 0.75rem; align-items: end; }
+.toolbar .field { min-width: 140px; flex: 1; }
+.muted { color: var(--muted); }
+.notice { padding: 0.5rem 0.7rem; background: var(--surface-2); border: 1px solid var(--border); border-radius: 6px; margin: 0.5rem 0; }
+.undo-bar { position: fixed; bottom: 1rem; left: 50%; transform: translateX(-50%); background: var(--surface); border: 1px solid var(--border); padding: 0.5rem 0.75rem; border-radius: 8px; box-shadow: var(--shadow); display: flex; gap: 0.5rem; align-items: center; z-index: 10; }
+.drop-target { outline: 2px dashed var(--primary); }
+.progress { font-size: 0.85rem; color: var(--muted); }
+@media (max-width: 800px) { .layout { grid-template-columns: 1fr; } .sidebar { border-right: none; border-bottom: 1px solid var(--border); } }
