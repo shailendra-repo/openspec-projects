@@ -1,0 +1,11 @@
+{% extends 'base.html' %}
+{% block title %}Home - Community Service{% endblock %}
+{% block content %}
+  <h1>Community Service Ticketing</h1>
+  <p>Residents can raise issues and track service tickets. Board members manage and resolve tickets.</p>
+  {% if not current_user.is_authenticated %}
+    <p><a class="btn" href="{{ url_for('auth.login') }}">Login</a></p>
+  {% else %}
+    <p><a class="btn" href="{{ url_for('main.dashboard') }}">Go to Dashboard</a></p>
+  {% endif %}
+{% endblock %}

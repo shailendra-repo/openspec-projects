@@ -1,0 +1,19 @@
+{% extends 'base.html' %}
+{% block title %}Create User - Community Service{% endblock %}
+{% block content %}
+  <h1>Create User</h1>
+  <form method="post" class="card form">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <label>Name <input type="text" name="name" value="{{ form.name or '' }}" required></label>
+    <label>Email <input type="email" name="email" value="{{ form.email or '' }}" required></label>
+    <label>Role
+      <select name="role">
+        <option value="resident" {% if form.role=='resident' %}selected{% endif %}>Resident</option>
+        <option value="board" {% if form.role=='board' %}selected{% endif %}>Board Member</option>
+      </select>
+    </label>
+    <label>Password <input type="password" name="password" required></label>
+    <label><input type="checkbox" name="is_active" {% if form.is_active or form=={} %}checked{% endif %}> Active</label>
+    <button type="submit">Create</button>
+  </form>
+{% endblock %}

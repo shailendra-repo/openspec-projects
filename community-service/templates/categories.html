@@ -1,0 +1,32 @@
+{% extends 'base.html' %}
+{% block title %}Categories - Community Service{% endblock %}
+{% block content %}
+  <h1>Categories</h1>
+  <form method="post" class="card form" style="max-width:400px;">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <input type="hidden" name="action" value="create">
+    <label>New category name <input type="text" name="name" required></label>
+    <button type="submit">Add Category</button>
+  </form>
+
+  <h2>Existing Categories</h2>
+  <table>
+    <thead><tr><th>Name</th><th>Active</th><th>Action</th></tr></thead>
+    <tbody>
+      {% for c in categories %}
+      <tr>
+        <td>{{ c.name }}</td>
+        <td>{{ 'yes' if c.is_active else 'no' }}</td>
+        <td>
+          <form method="post" style="margin:0;">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <input type="hidden" name="action" value="toggle">
+            <input type="hidden" name="category_id" value="{{ c.id }}">
+            <button type="submit" class="secondary">{% if c.is_active %}Deactivate{% else %}Activate{% endif %}</button>
+          </form>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+{% endblock %}

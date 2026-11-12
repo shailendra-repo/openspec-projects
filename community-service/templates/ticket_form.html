@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+{% block title %}New Ticket - Community Service{% endblock %}
+{% block content %}
+  <h1>Create Service Ticket</h1>
+  <form method="post" class="card form" enctype="multipart/form-data">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <label>Title <input type="text" name="title" value="{{ form.title or '' }}" required></label>
+    <label>Description <textarea name="description" rows="5" required>{{ form.description or '' }}</textarea></label>
+    <label>Category
+      <select name="category_id">
+        <option value="">-- None --</option>
+        {% for c in categories %}
+          <option value="{{ c.id }}" {% if form.category_id and form.category_id|int == c.id %}selected{% endif %}>{{ c.name }}</option>
+        {% endfor %}
+      </select>
+    </label>
+    <label>Priority
+      <select name="priority">
+        {% for p in ['low','medium','high','urgent'] %}
+          <option value="{{ p }}" {% if (form.priority or 'medium') == p %}selected{% endif %}>{{ p|capitalize }}</option>
+        {% endfor %}
+      </select>
+    </label>
+    <label>Attachments/Photos <input type="file" name="attachments" multiple></label>
+    <button type="submit">Submit Ticket</button>
+  </form>
+{% endblock %}

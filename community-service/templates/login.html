@@ -1,0 +1,12 @@
+{% extends 'base.html' %}
+{% block title %}Login - Community Service{% endblock %}
+{% block content %}
+  <h1>Login</h1>
+  <form method="post" class="card form">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <label>Email <input type="email" name="email" required></label>
+    <label>Password <input type="password" name="password" required></label>
+    <button type="submit">Login</button>
+  </form>
+  <p class="muted">Accounts are created by board members. Contact a board member if you need access.</p>
+{% endblock %}

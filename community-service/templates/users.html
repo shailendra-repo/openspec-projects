@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+{% block title %}Users - Community Service{% endblock %}
+{% block content %}
+  <h1>User Management</h1>
+  <p><a class="btn" href="{{ url_for('main.create_user') }}">Create User</a></p>
+  <table>
+    <thead><tr><th>Name</th><th>Email</th><th>Role</th><th>Active</th><th>Created</th></tr></thead>
+    <tbody>
+      {% for u in users %}
+      <tr>
+        <td>{{ u.name }}</td>
+        <td>{{ u.email }}</td>
+        <td>{{ u.role }}</td>
+        <td>{{ 'yes' if u.is_active else 'no' }}</td>
+        <td>{{ u.created_at.strftime('%Y-%m-%d') if u.created_at else '' }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+{% endblock %}

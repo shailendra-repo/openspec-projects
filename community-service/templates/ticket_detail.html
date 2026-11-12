@@ -1,0 +1,109 @@
+{% extends 'base.html' %}
+{% block title %}{{ ticket.ticket_number }} - Community Service{% endblock %}
+{% block content %}
+  <h1>Ticket {{ ticket.ticket_number }}: {{ ticket.title }}</h1>
+  <div class="card ticket-meta">
+    <p><strong>Status:</strong> {{ ticket.status }} | <strong>Priority:</strong> {{ ticket.priority }} | <strong>Category:</strong> {{ ticket.category.name if ticket.category else '—' }}</p>
+    <p><strong>Resident:</strong> {{ ticket.resident.name if ticket.resident else '' }} | <strong>Created:</strong> {{ ticket.created_at.strftime('%Y-%m-%d %H:%M') if ticket.created_at else '' }}</p>
+    {% if ticket.board_proposed_at %}<p><strong>Resolution proposed:</strong> {{ ticket.board_proposed_at.strftime('%Y-%m-%d %H:%M') }}</p>{% endif %}
+    {% if ticket.resident_ack_at %}<p><strong>Resident acknowledged:</strong> {{ ticket.resident_ack_at.strftime('%Y-%m-%d %H:%M') }}</p>{% endif %}
+    {% if ticket.closed_at %}<p><strong>Closed:</strong> {{ ticket.closed_at.strftime('%Y-%m-%d %H:%M') }}</p>{% endif %}
+    <p><strong>Description:</strong><br>{{ ticket.description }}</p>
+  </div>
+
+  <h2>Workflow Actions</h2>
+  <div class="card">
+    {% if current_user.role == 'board' %}
+      <form method="post" action="{{ url_for('main.propose', ticket_id=ticket.id) }}" style="display:inline-block; margin-right:8px;">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <button type="submit">Propose / Re-propose Resolution</button>
+      </form>
+      <form method="post" action="{{ url_for('main.close', ticket_id=ticket.id) }}" style="display:inline-block;">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <button type="submit" {% if ticket.status != 'resident_ack' %}disabled title="Resident acknowledgement required"{% endif %}>Close Ticket</button>
+      </form>
+      {% if ticket.status != 'resident_ack' %}<p class="muted">Close is enabled only after resident acknowledgement.</p>{% endif %}
+    {% endif %}
+
+    {% if current_user.role == 'resident' and current_user.id == ticket.resident_id %}
+      <form method="post" action="{{ url_for('main.acknowledge', ticket_id=ticket.id) }}">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <button type="submit" {% if ticket.status != 'board_proposed' %}disabled title="Available when resolution is proposed"{% endif %}>Acknowledge Proposed Resolution</button>
+      </form>
+      {% if ticket.status != 'board_proposed' %}<p class="muted">Acknowledgement is available when the board proposes a resolution.</p>{% endif %}
+    {% endif %}
+  </div>
+
+  <h2>Attachments</h2>
+  <div class="card">
+    {% set ns = namespace(has_ticket_atts=false) %}
+    <ul>
+    {% for a in attachments %}
+      {% if a.comment_id is none %}
+        {% set ns.has_ticket_atts = true %}
+        <li><a href="{{ url_for('main.download_attachment', attachment_id=a.id) }}">{{ a.original_name }}</a> ({{ a.uploader.name if a.uploader else 'user' }}, {{ a.created_at.strftime('%Y-%m-%d %H:%M') if a.created_at else '' }})</li>
+      {% endif %}
+    {% endfor %}
+    </ul>
+    {% if not ns.has_ticket_atts %}<p class="muted">No ticket-level attachments.</p>{% endif %}
+  </div>
+
+  <h2>Conversation</h2>
+  <div class="card">
+    {% macro render_comment(c, depth=0) %}
+      <div class="comment" style="margin-left: {{ depth * 20 }}px;">
+        <p><strong>{{ c.author.name }}</strong> ({{ c.author.role }}) - {{ c.created_at.strftime('%Y-%m-%d %H:%M') if c.created_at else '' }}</p>
+        <p>{{ c.body }}</p>
+        {% set ns2 = namespace(has=false) %}
+        {% for a in attachments %}{% if a.comment_id == c.id %}{% set ns2.has = true %}{% endif %}{% endfor %}
+        {% if ns2.has %}
+          <ul>
+          {% for a in attachments %}{% if a.comment_id == c.id %}
+            <li><a href="{{ url_for('main.download_attachment', attachment_id=a.id) }}">{{ a.original_name }}</a></li>
+          {% endif %}{% endfor %}
+          </ul>
+        {% endif %}
+
+        {% if (current_user.role == 'resident' and current_user.id == ticket.resident_id and c.author.role == 'board') or (current_user.role == 'board') %}
+          <details>
+            <summary>Reply</summary>
+            <form method="post" action="{{ url_for('main.add_comment', ticket_id=ticket.id) }}" enctype="multipart/form-data" class="form">
+              <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+              <input type="hidden" name="parent_comment_id" value="{{ c.id }}">
+              <label>Reply <textarea name="body" rows="3" required></textarea></label>
+              <label>Attachment <input type="file" name="attachments" multiple></label>
+              <button type="submit">Post Reply</button>
+            </form>
+          </details>
+        {% endif %}
+
+        {% for child in by_parent.get(c.id, []) %}
+          {{ render_comment(child, depth + 1) }}
+        {% endfor %}
+      </div>
+    {% endmacro %}
+
+    {% if roots %}
+      {% for c in roots %}
+        {{ render_comment(c, 0) }}
+      {% endfor %}
+    {% else %}
+      <p class="muted">No comments yet.</p>
+    {% endif %}
+
+    <hr>
+    <h3>Add Comment</h3>
+    <form method="post" action="{{ url_for('main.add_comment', ticket_id=ticket.id) }}" enctype="multipart/form-data" class="form">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      <label>Comment <textarea name="body" rows="4" required></textarea></label>
+      <label>Attachment <input type="file" name="attachments" multiple></label>
+      <button type="submit">Post Comment</button>
+    </form>
+    {% if current_user.role == 'resident' %}
+      <p class="muted">You can reply in context over board comments using the Reply option on a board comment.</p>
+    {% endif %}
+  </div>
+
+  <h2>Audit History</h2>
+  <p><a href="{{ url_for('main.ticket_audit', ticket_id=ticket.id) }}">View full audit timeline</a></p>
+{% endblock %}
